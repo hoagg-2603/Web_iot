@@ -1,9 +1,25 @@
 {
+  "name": "room-monitor-server",
+  "version": "1.0.0",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "keywords": [
+    "iot",
+    "mqtt",
+    "sensors"
+  ],
+  "author": "",
+  "license": "ISC",
+  "description": "IoT Room Monitor Server",
   "dependencies": {
     "cors": "^2.8.5",
-    "dotenv": "^17.2.2",
+    "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "mqtt": "^5.14.1",
-    "mysql2": "^3.14.5"
+    "mysql2": "^3.15.2"
   }
 }

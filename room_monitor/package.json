@@ -1,0 +1,19 @@
+{
+  "name": "room-monitor-system",
+  "version": "2.0.0",
+  "description": "Professional IoT Room Monitoring System",
+  "main": "server/app.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server/app.js",
+    "dev": "node --watch server/app.js",
+    "test": "echo \"No tests specified\" && exit 0",
+    "lint": "echo \"No linting configured\" && exit 0"
+  },
+  "keywords": ["iot", "monitoring", "mqtt", "express", "mysql"],
+  "author": "hoagg-2603",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

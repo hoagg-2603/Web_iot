@@ -1,0 +1,321 @@
+/* Pagination Styles */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    column-gap: 0.75rem;
+    row-gap: 0.75rem;
+    margin: 1.25rem 0 0.75rem 0;
+    flex-wrap: wrap;
+}
+
+/* Fallback spacing if flex gap is not supported */
+.pagination > *:not(:first-child) {
+    margin-left: 0.35rem;
+}
+
+.pagination-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 38px;
+        padding: 0 1rem; /* extra padding so labels aren't cramped */
+        color: var(--text-secondary);
+    padding: 0 0.75rem;
+    border: 1px solid var(--border-light);
+    background: var(--card-background);
+    color: var(--text-primary);
+    border-radius: 999px; /* pill */
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.875rem;
+    line-height: 1;
+    font-weight: 600;
+    text-decoration: none;
+    user-select: none;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+
+.pagination-btn:hover:not(.disabled) {
+    background: var(--primary-color);
+    color: #ffffff;
+    border-color: var(--primary-color);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+}
+
+/* Override hover for Prev/Next to keep outlined look instead of full fill */
+.pagination-prev:hover:not(.disabled),
+.pagination-next:hover:not(.disabled) {
+    background: var(--card-background);
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.pagination-btn:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.15), 0 1px 3px rgba(0,0,0,0.06);
+}
+
+.pagination-prev:focus-visible,
+.pagination-next:focus-visible {
+    outline: none;
+    background: var(--card-background);
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.15), 0 1px 3px rgba(0,0,0,0.06);
+}
+
+.pagination-btn.active {
+    background: var(--primary-color);
+    color: #ffffff;
+    border-color: var(--primary-color);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.16);
+}
+
+.pagination-btn.disabled {
+    background: var(--bg-secondary);
+    color: var(--text-muted);
+    border-color: var(--border-light);
+    cursor: not-allowed;
+    opacity: 0.6;
+    box-shadow: none;
+}
+
+    /* Also support native disabled attribute */
+    .pagination-btn[disabled],
+    .pagination-btn[aria-disabled="true"] {
+        background: var(--bg-secondary);
+        color: var(--text-muted);
+        border-color: var(--border-light);
+        cursor: not-allowed;
+        opacity: 0.6;
+        box-shadow: none;
+        pointer-events: none;
+    }
+
+.pagination-btn svg {
+    width: 18px;
+    height: 18px;
+}
+
+/* spacing for icons */
+.pagination-prev svg { margin-right: 6px; }
+.pagination-next svg { margin-left: 6px; }
+
+.pagination-prev,
+.pagination-next {
+    min-width: 48px;
+}
+
+/* Extra breathing room around Prev/Next labels */
+.pagination-prev { margin-right: 0.35rem; }
+.pagination-next { margin-left: 0.35rem; }
+
+.pagination-ellipsis {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    height: 38px;
+    color: var(--text-secondary);
+    font-weight: 600;
+    user-select: none;
+}
+
+/* Loading states */
+.loading, .no-data, .error {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+.error {
+    color: var(--error);
+}
+
+/* Search enhancement */
+.search-box {
+
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.search-results-info {
+    margin: 1rem 0;
+    padding: 0.75rem 1rem;
+    background: var(--info-light);
+    border-left: 4px solid var(--info);
+    border-radius: 0.5rem;
+    color: var(--info-dark);
+    font-size: 0.875rem;
+}
+
+/* Table enhancements */
+.sensor-log-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+}
+
+.sensor-log-table th,
+.sensor-log-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.sensor-log-table th {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.sensor-log-table tbody tr {
+    transition: all 0.2s ease;
+}
+
+.sensor-log-table tbody tr:hover {
+    background: var(--hover-light);
+}
+
+.table-container {
+    background: var(--card-background);
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+    margin-bottom: 2rem;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .pagination {
+        column-gap: 0.3rem;
+        row-gap: 0.5rem;
+    }
+    
+    .pagination-btn {
+        min-width: 34px;
+        height: 34px;
+        padding: 0 0.6rem;
+        font-size: 0.8rem;
+    }
+    
+    .pagination-ellipsis {
+        min-width: 26px;
+        height: 34px;
+    }
+    
+    /* Hide some page numbers on mobile */
+    .pagination-btn:nth-child(n+8):nth-last-child(n+4) {
+        display: none;
+    }
+}
+
+/* Animation for page transitions */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.sensor-log-table tbody tr {
+    animation: fadeInUp 0.3s ease-out;
+}
+
+.sensor-log-table tbody tr:nth-child(2) { animation-delay: 0.1s; }
+.sensor-log-table tbody tr:nth-child(3) { animation-delay: 0.2s; }
+.sensor-log-table tbody tr:nth-child(4) { animation-delay: 0.3s; }
+.sensor-log-table tbody tr:nth-child(5) { animation-delay: 0.4s; }
+
+/* Table Footer with Records Selector and Pagination */
+.table-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+    padding: 0.75rem 0 0.5rem 0;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.records-per-page {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.records-per-page label {
+    padding-top: 15px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+.records-selector {
+    margin-top: 20px;
+    padding: 0.5rem 2rem 0.5rem 0.75rem;
+    border: 2px solid var(--border-color);
+    border-radius: 0.5rem;
+    background: var(--card-background);
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1rem;
+    min-width: 80px;
+}
+
+.records-selector:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.records-selector:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
+}
+
+/* Responsive adjustments for table footer */
+@media (max-width: 768px) {
+    .table-footer {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .pagination {
+        justify-content: center;
+        margin: 1rem 0 0 0;
+    }
+    
+    .records-per-page {
+        justify-content: center;
+    }
+}
+
+/* Action log pagination styles (same as sensor log) */
+.action-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
