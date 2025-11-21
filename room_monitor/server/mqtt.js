@@ -3,129 +3,88 @@ import mqtt from 'mqtt';
 import { db } from './db.js';
 import { broadcast } from './sse.js';
 
-const VERBOSE = (process.env.LOG_LEVEL || '').toLowerCase() === 'debug';
-const logDebug = (...args) => { if (VERBOSE) console.log(...args); };
-
 let mqttClient;
-let lastSensorSample = { payload: '', ts: 0 };
-
-async function saveSensorData(data) {
-    try {
-        if (db && data.t !== undefined && data.h !== undefined && data.lux !== undefined) {
-            const query = 'INSERT IGNORE INTO data_sensor (t, h, lux, time_stamp) VALUES (?, ?, ?, NOW())';
-            const [result] = await db.execute(query, [data.t, data.h, data.lux]);
-            if (result.affectedRows === 0) {
-                logDebug('ℹDuplicate sensor sample ignored:', data);
-                return null;
-            }
-            logDebug('Sensor data saved:', data);
-            return { id_data: result.insertId, ...data, time_stamp: new Date().toISOString() };
-        }
-    } catch (error) {
-        console.error('Error saving sensor data:', error);
-    }
-    return null;
-}
-
-async function updateDeviceState(topic, data) {
-    try {
-        const deviceName = topic.split('/')[1];
-        if (db && deviceName && data.status !== undefined) {
-            const query = 'UPDATE device SET status = ? WHERE device_name = ?';
-            await db.execute(query, [data.status, deviceName]);
-            logDebug('Device state updated:', deviceName, data.status);
-        }
-    } catch (error) {
-        console.error('Error updating device state:', error);
-    }
-}
 
 export function initMqtt() {
     try {
-        const subTopicsEnv = (process.env.MQTT_SUB_TOPICS || '').split(',').map(s=>s.trim()).filter(Boolean);
-        const topicsToSubscribe = subTopicsEnv.length ? subTopicsEnv : ['sensors'];
-        const dynamicClientId = (process.env.MQTT_CLIENT_ID && !process.env.MQTT_CLIENT_ID.startsWith('#'))
-            ? process.env.MQTT_CLIENT_ID
-            : 'room-monitor-' + Math.random().toString(16).slice(2);
-
-        mqttClient = mqtt.connect(process.env.MQTT_BROKER_URL, {
-            username: process.env.MQTT_USERNAME || undefined,
-            password: process.env.MQTT_PASSWORD || undefined,
-            reconnectPeriod: 5000,
-            clean: true,
-            clientId: dynamicClientId
+        const mqttUrl = process.env.MQTT_BROKER_URL || 'mqtt://localhost:1883';
+        
+        mqttClient = mqtt.connect(mqttUrl, {
+            username: process.env.MQTT_USERNAME,
+            password: process.env.MQTT_PASSWORD,
+            clientId: 'server_backend_' + Math.random().toString(16).substr(2, 8)
         });
 
-        const broadcastMqttStatus = (status) => broadcast({ type: 'mqtt', status });
-
         mqttClient.on('connect', () => {
-            logDebug('MQTT connected successfully');
-            broadcastMqttStatus('connected');
-            mqttClient.subscribe(topicsToSubscribe, (err, granted) => {
-                if (err) {
-                    console.error('QTT subscribe error:', err.message);
-                } else {
-                    logDebug('MQTT subscribed topics:', granted.map(g=>g.topic).join(', '));
-                }
+            console.log('✅ MQTT Connected to Broker');
+            broadcast({ type: 'mqtt', status: 'connected' });
+            
+            // Subscribe các topic cần thiết
+            mqttClient.subscribe(['sensors', 'esp32/#'], (err) => {
+                if (!err) console.log('📡 Subscribed to topics: sensors, esp32/#');
             });
         });
 
         mqttClient.on('message', async (topic, message) => {
-            try {
-                logDebug('MQTT message received:', topic, message.toString());
-                
-                if (topic === 'sensors') {
-                    const csvData = message.toString().trim();
-                    const nowMs = Date.now();
-                    if (lastSensorSample.payload === csvData && (nowMs - lastSensorSample.ts) < 1500) {
-                        logDebug('Duplicate sensor MQTT within window, ignored');
-                        return;
-                    }
-                    const values = csvData.split(',');
-                    
-                    if (values.length >= 3) {
-                        const data = { t: parseFloat(values[0]), h: parseFloat(values[1]), lux: parseFloat(values[2]) };
-                        logDebug('Parsed sensor data:', data);
-                        lastSensorSample = { payload: csvData, ts: nowMs };
-                        const row = await saveSensorData(data);
-                        
-                        // Chỉ broadcast nếu lưu thành công
-                        if (row) {
-                            broadcast({
-                                type: 'sensor',
-                                t: data.t,
-                                h: data.h,
-                                lux: data.lux,
-                                time_stamp: row.time_stamp
-                            });
+            const payload = message.toString().trim();
+            
+            // 1. Xử lý dữ liệu Cảm biến (Topic: sensors)
+            if (topic === 'sensors') {
+                console.log(`📥 Sensor Data: ${payload}`); // Log để kiểm tra
+
+                // Parse dữ liệu (Bây giờ chỉ là 1 số float duy nhất)
+                const lux = parseFloat(payload);
+
+                if (!isNaN(lux)) {
+                    // Lưu vào DB (t=0, h=0, chỉ lưu lux)
+                    if (db) {
+                        try {
+                            // Sửa lại query DB cho phù hợp
+                            const query = 'INSERT INTO data_sensor (t, h, lux, time_stamp) VALUES (0, 0, ?, NOW())';
+                            await db.execute(query, [lux]);
+                        } catch (e) {
+                            console.error('⚠️ DB Save Error:', e.message);
                         }
-                    } else {
-                        logDebug('Invalid sensor data format:', csvData);
                     }
+
+                    // Gửi xuống Web ngay lập tức (Quan trọng!)
+                    broadcast({
+                        type: 'sensor',
+                        lux: lux,       // Gửi đúng trường lux
+                        lx: lux,        // Gửi thêm lx để dự phòng
+                        time_stamp: new Date().toISOString()
+                    });
                 }
+            }
+
+            // 2. Xử lý phản hồi trạng thái thiết bị (Topic: esp32/...)
+            if (topic.startsWith('esp32/')) {
+                const deviceName = topic.split('/')[1]; // Lấy tên: led, fan, spe
+                const isOn = (payload === '1');
                 
-                if (topic.startsWith('esp32/')) {
-                    const data = JSON.parse(message.toString());
-                    await updateDeviceState(topic, data);
+                // Cập nhật DB
+                if (db) {
+                    try {
+                        await db.execute('UPDATE device SET status=? WHERE device_name=?', [isOn ? 1 : 0, deviceName]);
+                    } catch (e) {}
                 }
-                
-            } catch (error) {
-                console.error('QTT message processing error:', error);
+
+                // Gửi xuống Web để cập nhật nút bấm
+                broadcast({ 
+                    type: 'device_update', 
+                    device: deviceName, 
+                    state: isOn ? 1 : 0 
+                });
             }
         });
 
-        mqttClient.on('error', (error) => {
-            console.error('MQTT connection error:', error);
-            broadcastMqttStatus('disconnected');
+        mqttClient.on('error', (err) => {
+            console.error('❌ MQTT Error:', err.message);
+            broadcast({ type: 'mqtt', status: 'disconnected' });
         });
 
-        mqttClient.on('close', () => broadcastMqttStatus('disconnected'));
-        mqttClient.on('offline', () => broadcastMqttStatus('disconnected'));
-        mqttClient.on('end', () => broadcastMqttStatus('disconnected'));
-        mqttClient.on('reconnect', () => broadcastMqttStatus('disconnected'));
-
     } catch (error) {
-        console.error('MQTT setup failed:', error);
+        console.error('Init MQTT Failed:', error);
     }
 }
 

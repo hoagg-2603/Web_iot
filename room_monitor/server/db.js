@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
+// Đảm bảo .env được nạp
 dotenv.config({ path: path.join(path.dirname(fileURLToPath(import.meta.url)), '.env') });
 
 const VERBOSE = (process.env.LOG_LEVEL || '').toLowerCase() === 'debug';
@@ -32,6 +33,7 @@ export async function initDatabase() {
         return;
     }
     try {
+        // Chỉ thực hiện một truy vấn đơn giản để kiểm tra kết nối
         await db.query('SELECT 1');
         logDebug('Database connection test successful.');
         

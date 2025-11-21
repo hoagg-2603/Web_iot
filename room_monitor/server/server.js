@@ -11,7 +11,7 @@ import { initMqtt, mqttClient } from './mqtt.js';
 import { sseHandler } from './sse.js';
 import apiRoutes from './routes.js';
 
-// Load .env (db.js load)
+// Load .env (db.js đã load rồi, nhưng để ở đây cho chắc chắn)
 dotenv.config({ path: path.join(path.dirname(fileURLToPath(import.meta.url)), '.env') });
 
 const __filename = fileURLToPath(import.meta.url);

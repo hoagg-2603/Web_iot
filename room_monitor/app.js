@@ -39,8 +39,11 @@ async function setupDeviceControls() {
 
             // Quyết định hành động dựa trên trạng thái HIỆN TẠI
             const action = this.classList.contains('active') ? 'off' : 'on';
+
+            // Thêm class 'loading'
             this.classList.add('loading');
             
+            // Gọi API
             controlDevice(device, action).catch((error) => {
                 console.error('Control device failed (API level):', error);
                 // Nếu API lỗi, server sẽ không gửi SSE,
@@ -51,6 +54,7 @@ async function setupDeviceControls() {
     });
 }
 
+// Hàm khởi tạo Dashboard
 async function initializeDashboard() {
     await initDashboardChart();
     

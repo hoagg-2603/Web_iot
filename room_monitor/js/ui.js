@@ -19,22 +19,28 @@ export function setControlsDisabled(disabled) {
     });
 }
 
+// js/ui.js
 export function updateSensorDisplay(sensorData) {
     if (!sensorData) return;
-    const { t, h, lx } = sensorData;
 
-    const tempEl = document.getElementById('temperature-value');
-    if (tempEl && typeof t === 'number') tempEl.textContent = t.toFixed(1);
-    
-    const humEl = document.getElementById('humidity-value');
-    if (humEl && typeof h === 'number') humEl.textContent = h.toFixed(1);
-    
+    const rawLux = sensorData.lx ?? sensorData.lux ?? sensorData.light ?? 0;
+    const luxValue = Math.round(Number(rawLux));
+
+    // 1. Cập nhật số hiển thị
     const lightEl = document.getElementById('light-value');
-    if (lightEl && typeof lx === 'number') lightEl.textContent = Math.round(lx);
-    
-    animateSensorCard('temperature-card');
-    animateSensorCard('humidity-card'); 
-    animateSensorCard('light-card');
+    if (lightEl) {
+        lightEl.textContent = luxValue;
+    }
+
+    // 2. Xử lý ĐÈN CẢNH BÁO (Logic mới thêm)
+    const warningDiv = document.getElementById('warning-device');
+    if (warningDiv) {
+        if (luxValue > 50) {
+            warningDiv.classList.add('blinking'); // Thêm hiệu ứng nháy
+        } else {
+            warningDiv.classList.remove('blinking'); // Tắt hiệu ứng
+        }
+    }
 }
 
 export function updateDeviceToggles(deviceStates) {

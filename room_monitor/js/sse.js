@@ -27,13 +27,15 @@ export function setupSSEConnection(callbacks) {
             }
             if (data.type === 'sensor' || data.t !== undefined) {
                 const sensorData = {
-                    t: data.t || data.temp || data.temperature,
-                    h: data.h || data.humi || data.humidity, 
+                    // t và h có thể undefined cũng không sao
+                    t: data.t,
+                    h: data.h, 
+                    // Quan trọng là lấy được Lux
                     lx: data.lx || data.lux || data.light || 0
                 };
-                if (sensorData.t !== undefined) {
-                    onSensorData(sensorData);
-                }
+                
+                // 👇 SỬA LẠI: Luôn gọi hàm onSensorData để cập nhật giao diện
+                onSensorData(sensorData);
             }
         } catch (error) {}
     };

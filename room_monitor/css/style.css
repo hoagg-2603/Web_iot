@@ -420,3 +420,14 @@ body {
         height: 60px;
     }
 }
+
+@keyframes blink-red {
+    0% { background-color: var(--panel-bg); box-shadow: none; }
+    50% { background-color: rgba(255, 0, 0, 0.3); box-shadow: 0 0 15px red; }
+    100% { background-color: var(--panel-bg); box-shadow: none; }
+}
+
+.blinking {
+    animation: blink-red 0.5s infinite; /* Nháy nhanh 0.5s/lần */
+    border: 1px solid red;
+}

@@ -66,12 +66,35 @@ function createChart(ctx, chartData) {
         data: {
             labels: chartData.labels,
             datasets: [
-                { label: 'Temperature (°C)', data: chartData.temperature, borderColor: '#F81717', backgroundColor: 'rgba(248,23,23,0.1)', tension: 0.4, pointRadius: 6, pointBackgroundColor: '#F81717', pointBorderColor: '#ffffff', pointBorderWidth: 3, yAxisID: 'y' },
-                { label: 'Humidity (%)', data: chartData.humidity, borderColor: '#2F69E6', backgroundColor: 'rgba(47,105,230,0.1)', tension: 0.4, pointRadius: 6, pointBackgroundColor: '#2F69E6', pointBorderColor: '#ffffff', pointBorderWidth: 3, yAxisID: 'y1' },
-                { label: 'Light (lux)', data: chartData.light, borderColor: '#FCF013', backgroundColor: 'rgba(252,240,19,0.1)', tension: 0.4, pointRadius: 6, pointBackgroundColor: '#FCF013', pointBorderColor: '#333333', pointBorderWidth: 3, yAxisID: 'y2' }
+                // XÓA dataset Temperature và Humidity cũ
+                { 
+                    label: 'Light (lux)', 
+                    data: chartData.light, 
+                    borderColor: '#FCF013', 
+                    backgroundColor: 'rgba(252,240,19,0.2)', // Tăng độ đậm nền chút
+                    tension: 0.4, 
+                    pointRadius: 4, 
+                    pointBackgroundColor: '#FCF013', 
+                    pointBorderColor: '#333',
+                    fill: true, // Bật fill cho đẹp vì chỉ còn 1 biểu đồ
+                    yAxisID: 'y' 
+                }
             ]
         },
-        options: chartOptions
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: { grid: { display: false } }, // Ẩn lưới dọc cho thoáng
+                y: { 
+                    type: 'linear', 
+                    position: 'left', 
+                    min: 0, 
+                    max: 100 // Vì random 0-100
+                }
+                // Xóa y1, y2 không cần thiết nữa
+            }
+        }
     });
 }
 
@@ -105,14 +128,13 @@ export function updateChart(newData) {
     sensorChart.data.labels.push(timeLabel);
     if (sensorChart.data.labels.length > MAX_POINTS) sensorChart.data.labels.shift();
 
-    const { t, h, lx } = newData;
-    sensorChart.data.datasets[0].data.push(t);
-    if (sensorChart.data.datasets[0].data.length > MAX_POINTS) sensorChart.data.datasets[0].data.shift();
-    sensorChart.data.datasets[1].data.push(h);
-    if (sensorChart.data.datasets[1].data.length > MAX_POINTS) sensorChart.data.datasets[1].data.shift();
-    sensorChart.data.datasets[2].data.push(lx || 0);
-    if (sensorChart.data.datasets[2].data.length > MAX_POINTS) sensorChart.data.datasets[2].data.shift();
+    // Chỉ push dữ liệu Light
+    const val = (newData.lx !== undefined) ? newData.lx : (newData.lux || 0);
+    sensorChart.data.datasets[0].data.push(val);
+    
+    if (sensorChart.data.datasets[0].data.length > MAX_POINTS) {
+        sensorChart.data.datasets[0].data.shift();
+    }
 
     sensorChart.update('none');
-    saveChartCache();
 }
