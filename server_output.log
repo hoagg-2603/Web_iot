@@ -1,6 +1,0 @@
-[dotenv@17.2.3] injecting env (11) from .env -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
-✅ Database connected successfully
-🚀 Server running on http://localhost:3000MQTT_BROKER_URL=mqtt://172.23.81.222:1883
-📊 Database: 127.0.0.1DB_HOST=127.0.0.1
-📡 MQTT Broker: mqtt://172.23.81.222:1883MQTT_BROKER_URL=mqtt://172.23.81.222:1883
-✅ MQTT connected successfully

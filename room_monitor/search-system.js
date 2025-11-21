@@ -1,4 +1,3 @@
-// ===== HỆ THỐNG TÌM KIẾM HOÀN TOÀN MỚI =====
 
 // Configuration
 const API_BASE_URL = 'http://localhost:3000';

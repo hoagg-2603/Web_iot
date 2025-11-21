@@ -1,0 +1,9 @@
+## How to start
+- cd "C:\Program Files\mosquitto"
+- mosquitto.exe -c my.conf -v
+- Control devices: mosquitto_pub -h 10.115.167.222 -p 1883 -u hoaggg -P 123456 -t "led\fan\spe" -m "1\0"
+- Esp sub infomation: mosquitto_sub -h 10.115.167.222 -p 1883 -u hoaggg -P 123456 -t sensors -v
+-Logic phân biệt actor:
+devices/*/set → USER (lệnh từ web interface)
+led, fan, spe → USER (lệnh trực tiếp MQTT)
+esp32/* → ESP32 (feedback từ thiết bị)

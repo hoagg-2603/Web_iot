@@ -1,2 +1,0 @@
-(node:21332) [DEP0170] DeprecationWarning: The URL mqtt://172.23.81.222:1883MQTT_BROKER_URL=mqtt://172.23.81.222:1883 is invalid. Future versions of Node.js will throw an error.
-(Use `node --trace-deprecation ...` to show where the warning was created)
